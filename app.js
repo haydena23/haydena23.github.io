@@ -1,7 +1,7 @@
 var url = "https://api.spotify.com/v1/search?q={name}&type=artist";
 var relatedArtist = "https://api.spotify.com/v1/artists/{id}/related-artists"
-var clientID = "c86f967694ef490cad43a960a3767bff";
-var clientSecret = "a627dab1871249b482778f65353ec42a";
+var clientID = "8d2bba2a92db40bd8b107fbe226957b9";
+var clientSecret = "53dcaf963d5348798fc5e3fce02117f6";
 var redirect_uri = "https://haydena23.github.io";
 var scopes = 'user-read-private user-read-email'
 
@@ -43,3 +43,7 @@ function getNameFromId(id, callback) {
 		callback(data);
 	}
 }
+
+document.getElementById("searchButton").addEventListener("click", function(){
+	
+});

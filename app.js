@@ -3,9 +3,12 @@ var relatedArtist = "https://api.spotify.com/v1/artists/{id}/related-artists"
 var clientID = "8d2bba2a92db40bd8b107fbe226957b9";
 var clientSecret = "53dcaf963d5348798fc5e3fce02117f6";
 var redirect_uri = "https://haydena23.github.io";
-var scopes = 'user-read-private user-read-email'
+var scopes = 'user-read-private user-read-email';
+//document="index.html";
+
 
 function getIdFromName(name, callback) {
+	console.log("finding name");
 	var request = new XMLHttpRequest();
 	var searchUrl = "https://api.spotify.com/v1/search?q={name}&type=artist";
 	searchUrl = searchUrl.replace("{name}", name);
@@ -45,5 +48,8 @@ function getNameFromId(id, callback) {
 }
 
 document.getElementById("searchButton").addEventListener("click", function(){
-	
+	console.log("button pressed");
+	var name = document.getElementById("searchField").value;
+	console.log(name);
+	//var data = getIdFromName(name, data);
 });

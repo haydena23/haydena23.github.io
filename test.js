@@ -12,17 +12,18 @@ var authOptions = {
   },
   json: true
 };
-var token = 'BQDTobEeNbUIAcLaxWCYv-dCxpZYsEzVu4JsYGoncAqHq7uOq4BAWI5NkevK-z76TRV08Fo2kPk5MB77zxE';
-// request.post(authOptions, function(error, response, body) {
-//   if (!error && response.statusCode === 200) {
-//     token = body.access_token;
-//   }
-//   else{
-//       token='BQDTobEeNbUIAcLaxWCYv-dCxpZYsEzVu4JsYGoncAqHq7uOq4BAWI5NkevK-z76TRV08Fo2kPk5MB77zxE'
-//   }
-// });
+var token = 'BQBo2XUAwJUMl_RYlBTueIzGuCod5tLOlw8Zi_VGAZQ-lzIcGV2WuhwNu3ZaRIaOmr9CIqO4akskmQiVryg';
+request.post(authOptions, function(error, response, body) {
+  if (!error && response.statusCode === 200) {
+    token = body.access_token;
+  }
+  // else{
+  //     token='BQDTobEeNbUIAcLaxWCYv-dCxpZYsEzVu4JsYGoncAqHq7uOq4BAWI5NkevK-z76TRV08Fo2kPk5MB77zxE'
+  // }
+  console.log(token);
+});
 var getOptions = {
-    url: 'https://api.spotify.com/v1/tracks/11dFghVXANMlKmJXsNCbNl',
+    url: 'https://api.spotify.com/v1/search?q=kygo&type=artist',
     headers: {
         'Authorization': 'Bearer ' + token
     },

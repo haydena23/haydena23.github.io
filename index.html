@@ -1,9 +1,42 @@
 <!DOCTYPE html>
 <html>
-<body>
-
-<h1>My First Heading</h1>
-<p>My first paragraph.</p>
-
-</body>
-</html> 
+  <head>
+    <title>Cytoscape.js initialisation</title>
+    <meta name="description" content="Graph visualizer for finding artists" />
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui"
+    />
+    <link href="style.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/2.7.10/cytoscape.js"></script>
+  </head>
+  <body>
+    <h1>Musical Nodes</h1>
+    <form>
+      <label for="search">SEARCH</label>
+      <input type="text" />
+      <button type="button">ENTER</button>
+    </form>
+    <section>
+      <div id="cy"></div>
+    </section>
+    <section>
+      <div id="bio">
+        <h2 id="artist">Artist</h2>
+        <p>
+          Lorem Ipsum is simply dummy text of the printing and typesetting
+          industry. Lorem Ipsum has been the industry's standard dummy text ever
+          since the 1500s, when an unknown printer took a galley of type and
+          scrambled it to make a type specimen book. It has survived not only
+          five centuries, but also the leap into electronic typesetting,
+          remaining essentially unchanged. It was popularised in the 1960s with
+          the release of Letraset sheets containing Lorem Ipsum passages, and
+          more recently with desktop publishing software like Aldus PageMaker
+          including versions of Lorem Ipsum.
+        </p>
+      </div>
+    </section>
+    <script src="index.js"></script>
+  </body>
+</html>

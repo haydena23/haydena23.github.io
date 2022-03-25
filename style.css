@@ -1,0 +1,17 @@
+#cy {
+  height: 100%;
+  width: 60%;
+  position: absolute;
+  /* left: 0; */
+  /* top: 0; */
+  float: left;
+  padding: 1%;
+}
+
+#bio {
+  width: 30%;
+  /* position: absolute; */
+  float: right;
+  /* padding: 1%; */
+  justify-content: center;
+}

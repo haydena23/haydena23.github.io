@@ -12,7 +12,7 @@ var authOptions = {
   },
   json: true
 };
-var token = 'BQBo2XUAwJUMl_RYlBTueIzGuCod5tLOlw8Zi_VGAZQ-lzIcGV2WuhwNu3ZaRIaOmr9CIqO4akskmQiVryg';
+var token = 'BQCTcKprybmGi6AFBBrvGNG5zzWNaBt9zcjYV9fQnBeoO7Z5vQPcr54IbeZ2O9d9zIjUryvyU7taUMaog2_buA__VLcVjcEYRyuuV_KnYc1HOVsQgIi0YRIM9EQyFQrZfTlsE0Wb3zd2';
 request.post(authOptions, function(error, response, body) {
   if (!error && response.statusCode === 200) {
     token = body.access_token;
@@ -20,7 +20,7 @@ request.post(authOptions, function(error, response, body) {
   // else{
   //     token='BQDTobEeNbUIAcLaxWCYv-dCxpZYsEzVu4JsYGoncAqHq7uOq4BAWI5NkevK-z76TRV08Fo2kPk5MB77zxE'
   // }
-  console.log(token);
+  //console.log(token);
 });
 var getOptions = {
     url: 'https://api.spotify.com/v1/search?q=kygo&type=artist',
@@ -31,11 +31,10 @@ var getOptions = {
 };
 request.get(getOptions, function(error,response,body){
     if(!error && response.statusCode === 200) {
+        //var data = JSON.parse(response).artists.items[0].id;
         console.log(body);
     }
     else{
         console.log(response);
     }
-});
-
-    
+});   

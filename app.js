@@ -7,7 +7,22 @@ var scopes = 'user-read-private user-read-email';
 var token = 'BQA6i8CKmnfcyCizkGAxpT63_iEs-tSZHk3PMwX4DHy1sQYoziMUjDuCvmHDMBUNci5ir1jTuuHm1W9XQpM';
 
 var artistName;
-var getOptions;
+
+var artistListNames = [];
+var artistListId = [];
+
+var nodes = [{
+	name: '',
+	id: ''
+}];
+
+var edges = [{
+	name: '',
+	source: '',
+	target: ''
+}];
+
+//var iterations = 0;;
 
 //document="index.html";
 var authOptions = {"form":{"grant_type":"client_credentials"}};
@@ -43,7 +58,7 @@ async function getIdFromName(name, callback) {
 	request.setRequestHeader('Authorization', 'Bearer ' + token);
 	request.setRequestHeader('Content-Type', 'application/json');
 	request.onload = function() {
-		var data = JSON.parse(request.responseText).artists.items[0].id;
+		var data = JSON.parse(request.responseText).artists.items[0];
 		console.log(data);
 		callback(data);		
 	}
@@ -61,9 +76,9 @@ async function getRelatedArtists(baseArtistId, callback) {
 		request.open("GET", relatedArtistUrl, true);
 		request.setRequestHeader('Authorization', 'Bearer ' + token);
 		request.setRequestHeader('Content-Type', 'application/json');
-		
+			
 		request.onload = function () {
-			var data = JSON.parse(request.responseText).artists[0].name;
+			var data = JSON.parse(request.responseText).artists;
 			callback(data);
 		}
 		request.send(null);
@@ -89,13 +104,88 @@ document.getElementById("searchButton").addEventListener("click", async function
 	var name = document.getElementById("searchField").value;
 	var artistdata;
 	console.log(name);
+	/** FIRST PASSTHROUGH **/
 	await getIdFromName(name, async function(data) {
-		artistIdOne = data;
+		artistIdOne = data.id;
+		artistNameOne = data.name;
+
+		if(!nodes.includes({name: artistNameOne, id: artistIdOne})) {
+			nodes.push({name: artistNameOne, id: artistIdOne});
+		}
 		await getRelatedArtists(artistIdOne, function(data) {
 			artistdata = data;
-			console.log(artistdata);
+			for(var i = 0; i < 20; i++) {
+				if(!nodes.includes({name: data[i].name, id: data[i].id})) {
+					nodes.push({name: data[i].name, id: data[i].id});
+					edges.push({
+						name: artistNameOne + data[i].name,
+						source: artistNameOne,
+						target: data[i].name
+					})
+				}
+			}
+			nodes.shift();
+			edges.shift();
+			console.log(artistdata)
+			console.log(nodes);
+			console.log(edges);
 		}, 10);
 	}, 10);
-	
-	//var data = getIdFromName(name, data);
 });
+
+function refreshDialer(){
+	for(var i = 0; i < nodes.length; i++) {
+		cy.add([
+			{group: "nodes", data: {id: nodes[i].name}},
+			{group: "edges", data: {id: nodes[0].name+nodes[i].name, source: nodes[0].name, target: nodes[i].name}}
+		])
+	};
+	const elsRemoved = cy.elements().remove();
+	elsRemoved.restore();
+	console.log(cy);
+ }
+
+document.getElementById("reload").addEventListener("click", function() {
+	refreshDialer();
+	console.log("Refreshed");
+});
+
+let cy = cytoscape({
+	container: document.getElementById('cy'),
+  
+	elements: {
+	  nodes: [
+		{
+		  data: { id: 'a' }
+		},
+  
+		{
+		  data: { id: 'b' }
+		}
+	  ],
+	  edges: [
+		{
+		  data: { id: 'ab', source: 'a', target: 'b' }
+		}
+	  ]
+	},
+	userZoomingEnabled: false,
+	userPanningEnabled: false,
+	boxSelectionEnabled: false,
+	autounselectify: true,
+	layout: {
+	  name: 'grid',
+	  rows: 1
+	},
+  
+	// so we can see the ids
+	style: [
+	  {
+		selector: 'node',
+		style: {
+		  'label': 'data(id)'
+		}
+	  }
+	]
+  });
+  

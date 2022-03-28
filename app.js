@@ -137,12 +137,24 @@ function refreshDialer(){
 	for(var i = 0; i < nodes.length; i++) {
 		cy.add([
 			{group: "nodes", data: {id: nodes[i].name}},
-			{group: "edges", data: {id: nodes[0].name+nodes[i].name, source: nodes[0].name, target: nodes[i].name}}
-		])
+		]);
+		console.log("Adding node: " + nodes[i].name);
 	};
-	const elsRemoved = cy.elements().remove();
-	elsRemoved.restore();
-	console.log(cy);
+	for(var i = 1; i < nodes.length; i++) {
+		cy.add([
+			{group: "edges", data: {id: nodes[0].name+nodes[i].name, source: nodes[0].name, target: nodes[i].name}}
+		]);
+	}
+	cy.remove('node[id="a"]');
+	cy.remove('node[id="b"]');
+	cy.layout({
+		name: 'circle',
+
+		animate: true,
+		animationDuration: 1000,
+		fit: true,
+	});
+	//layout.run();
  }
 
 document.getElementById("reload").addEventListener("click", function() {
@@ -169,8 +181,8 @@ let cy = cytoscape({
 		}
 	  ]
 	},
-	userZoomingEnabled: false,
-	userPanningEnabled: false,
+	userZoomingEnabled: true,
+	userPanningEnabled: true,
 	boxSelectionEnabled: false,
 	autounselectify: true,
 	layout: {

@@ -1,40 +1,73 @@
-//import { post } from 'request';
-//import {Buffer} from 'buffer';
-
 var url = "https://api.spotify.com/v1/search?q={name}&type=artist";
 var relatedArtist = "https://api.spotify.com/v1/artists/{id}/related-artists"
 var client_id = '8d2bba2a92db40bd8b107fbe226957b9';
 var client_secret = '53dcaf963d5348798fc5e3fce02117f6';
 var redirect_uri = "https://haydena23.github.io";
 var scopes = 'user-read-private user-read-email';
+var token = 'BQA6i8CKmnfcyCizkGAxpT63_iEs-tSZHk3PMwX4DHy1sQYoziMUjDuCvmHDMBUNci5ir1jTuuHm1W9XQpM';
 
 var artistName;
 var getOptions;
 
 //document="index.html";
+var authOptions = {"form":{"grant_type":"client_credentials"}};
 
-function getIdFromName(name, callback) {
+function updateToken() {
+
+	var request = new XMLHttpRequest();
+	request.open('POST', 'https://accounts.spotify.com/api/token', true);
+	request.setRequestHeader('Authorization', 'Basic OGQyYmJhMmE5MmRiNDBiZDhiMTA3ZmJlMjI2OTU3Yjk6NTNkY2FmOTYzZDUzNDg3OThmYzVlM2ZjZTAyMTE3ZjY=');
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	var t;
+	request.onload = function() {
+		console.log(this.responseText);
+		token = JSON.parse(request.responseText).access_token;
+		console.log(token);
+	}
+	request.send("grant_type=client_credentials");
+
+	return token;
+	
+}
+function resolveAfter2Seconds(x) {
+	return new Promise(resolve => {
+	  setTimeout(() => {
+		resolve(x);
+	  }, 2000);
+	});
+  }
+
+async function getIdFromName(name, callback) {
+	token = await resolveAfter2Seconds(updateToken());
 	var request = new XMLHttpRequest();
 	var searchUrl = "https://api.spotify.com/v1/search?q={name}&type=artist";
 	searchUrl = searchUrl.replace("{name}", name);
 	request.open("GET", searchUrl, true);
-	request.setRequestHeader('Authorization', 'BQCTcKprybmGi6AFBBrvGNG5zzWNaBt9zcjYV9fQnBeoO7Z5vQPcr54IbeZ2O9d9zIjUryvyU7taUMaog2_buA__VLcVjcEYRyuuV_KnYc1HOVsQgIi0YRIM9EQyFQrZfTlsE0Wb3zd2')
-	request.send(null);
+	request.setRequestHeader('Authorization', 'Bearer ' + token);
+	request.setRequestHeader('Content-Type', 'application/json');
 	request.onload = function() {
 		var data = JSON.parse(request.responseText).artists.items[0].id;
+		console.log(data);
 		callback(data);
+		
 	}
+	request.send(null);
+	
 }
 
 function getRelatedArtists(baseArtistId, callback) {
 	var request = new XMLHttpRequest();
+	console.log("trying to get related artists");
 	if (baseArtistId !== undefined) {
+		console.log('getting related artists');
 		var relatedArtistUrl = "https://api.spotify.com/v1/artists/{id}/related-artists"
 		relatedArtistUrl = relatedArtistUrl.replace("{id}", baseArtistId);
 		request.open("GET", relatedArtistUrl, true);
+		request.setRequestHeader('Authorization', 'Bearer ' + token);
+		request.setRequestHeader('Content-Type', 'application/json');
 		request.send(null);
 		request.onload = function () {
-			var data = JSON.parse(request.responseText).artists;
+			var data = JSON.parse(request.responseText);
 			callback(data);
 		}
 	}
@@ -52,14 +85,22 @@ function getNameFromId(id, callback) {
 	}
 }
 
-document.getElementById("searchButton").addEventListener("click", function(){
+document.getElementById("searchButton").addEventListener("click", async function(){
 
 	console.log("button pressed");
 	var artistIdOne;
 	var name = document.getElementById("searchField").value;
+	var artistdata;
 	console.log(name);
-	getIdFromName(name, function(data) {
+	await getIdFromName(name, async function(data) {
 		artistIdOne = data;
-		}, 100);
+		await getRelatedArtists(artistIdOne, function(data) {
+			artistdata = data;
+		}, 10);
+
+		console.log(artistdata);
+
+	}, 10);
+	
 	//var data = getIdFromName(name, data);
 });

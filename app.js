@@ -45,8 +45,7 @@ async function getIdFromName(name, callback) {
 	request.onload = function() {
 		var data = JSON.parse(request.responseText).artists.items[0].id;
 		console.log(data);
-		callback(data);
-		
+		callback(data);		
 	}
 	request.send(null);
 	
@@ -96,9 +95,6 @@ document.getElementById("searchButton").addEventListener("click", async function
 			artistdata = data;
 			console.log(artistdata);
 		}, 10);
-
-		
-
 	}, 10);
 	
 	//var data = getIdFromName(name, data);

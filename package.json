@@ -1,6 +1,9 @@
 {
+  "type": "module",
   "dependencies": {
     "cytoscape": "^3.21.0",
+    "cytoscape-euler": "^1.2.2",
+    "node": "^17.7.1",
     "request": "^2.88.2"
   }
 }

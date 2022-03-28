@@ -25,20 +25,17 @@ function updateToken() {
 		console.log(token);
 	}
 	request.send("grant_type=client_credentials");
-
-	return token;
-	
 }
 function resolveAfter2Seconds(x) {
 	return new Promise(resolve => {
 	  setTimeout(() => {
 		resolve(x);
-	  }, 2000);
+	  }, 30000);
 	});
   }
 
 async function getIdFromName(name, callback) {
-	token = await resolveAfter2Seconds(updateToken());
+	//await updateToken();
 	var request = new XMLHttpRequest();
 	var searchUrl = "https://api.spotify.com/v1/search?q={name}&type=artist";
 	searchUrl = searchUrl.replace("{name}", name);
@@ -65,11 +62,12 @@ function getRelatedArtists(baseArtistId, callback) {
 		request.open("GET", relatedArtistUrl, true);
 		request.setRequestHeader('Authorization', 'Bearer ' + token);
 		request.setRequestHeader('Content-Type', 'application/json');
-		request.send(null);
+		
 		request.onload = function () {
-			var data = JSON.parse(request.responseText);
+			var data = JSON.parse(request.responseText).artists[0].name;
 			callback(data);
 		}
+		request.send(null);
 	}
 }
 
@@ -96,9 +94,10 @@ document.getElementById("searchButton").addEventListener("click", async function
 		artistIdOne = data;
 		await getRelatedArtists(artistIdOne, function(data) {
 			artistdata = data;
+			console.log(artistdata);
 		}, 10);
 
-		console.log(artistdata);
+		
 
 	}, 10);
 	

@@ -35,7 +35,7 @@ function resolveAfter2Seconds(x) {
   }
 
 async function getIdFromName(name, callback) {
-	//await updateToken();
+	updateToken();
 	var request = new XMLHttpRequest();
 	var searchUrl = "https://api.spotify.com/v1/search?q={name}&type=artist";
 	searchUrl = searchUrl.replace("{name}", name);
@@ -51,7 +51,7 @@ async function getIdFromName(name, callback) {
 	
 }
 
-function getRelatedArtists(baseArtistId, callback) {
+async function getRelatedArtists(baseArtistId, callback) {
 	var request = new XMLHttpRequest();
 	console.log("trying to get related artists");
 	if (baseArtistId !== undefined) {
@@ -82,8 +82,8 @@ function getNameFromId(id, callback) {
 	}
 }
 
+updateToken();
 document.getElementById("searchButton").addEventListener("click", async function(){
-
 	console.log("button pressed");
 	var artistIdOne;
 	var name = document.getElementById("searchField").value;

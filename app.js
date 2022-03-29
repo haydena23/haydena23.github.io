@@ -154,8 +154,18 @@ function refreshDialer(){
 		animationDuration: 1000,
 		fit: true,
 	});
-	//layout.run();
  }
+
+ /**Experimental Function, could use later **/
+//  document.getElementById("reset").addEventListener("click", function() {
+// 	nodes = [];
+// 	edges = [];
+// 	var collection = cy.elements('node');
+// 	cy.remove(collection);
+// 	var collection2 = cy.elements('edge');
+// 	cy.remove(collection2);
+// 	console.log("Reset");
+// });
 
 document.getElementById("reload").addEventListener("click", function() {
 	refreshDialer();

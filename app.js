@@ -13,7 +13,14 @@ var artistListId = [];
 
 var nodes = [{
 	name: '',
-	id: ''
+	id: '',
+	followers: 0,
+	genres: [''],
+	imageHeight: 0,
+	imageUrl: '',
+	imageWidth: 0,
+	popularity: 0,
+	uri: ''
 }];
 
 var edges = [{
@@ -22,9 +29,45 @@ var edges = [{
 	target: ''
 }];
 
-//var iterations = 0;;
+let cy = cytoscape({
+	container: document.getElementById('cy'),
+  
+	elements: {
+	  nodes: [
+		{
+		  data: { id: 'a' }
+		},
+  
+		{
+		  data: { id: 'b' }
+		}
+	  ],
+	  edges: [
+		{
+		  data: { id: 'ab', source: 'a', target: 'b' }
+		}
+	  ]
+	},
+	userZoomingEnabled: true,
+	userPanningEnabled: true,
+	boxSelectionEnabled: false,
+	autounselectify: true,
+	layout: {
+	  name: 'grid',
+	  rows: 1
+	},
+  
+	// so we can see the ids
+	style: [
+	  {
+		selector: 'node',
+		style: {
+		  'label': 'data(id)'
+		}
+	  }
+	]
+  });
 
-//document="index.html";
 var authOptions = {"form":{"grant_type":"client_credentials"}};
 
 function updateToken() {
@@ -108,15 +151,50 @@ document.getElementById("searchButton").addEventListener("click", async function
 	await getIdFromName(name, async function(data) {
 		artistIdOne = data.id;
 		artistNameOne = data.name;
+		artistFollowersOne = data.followers.total;
+		artistGenresOne = data.genres;
+		artistImageHeightOne = data.images[1].height;
+		artistImageUrlOne = data.images[1].url;
+		artistImageWidthOne = data.images[1].width;
+		artistPopularityOne = data.popularity;
+		artistUriOne = data.uri;
+		
+		/** Console checks for variables **/
+		// console.log(artistNameOne);
+		// console.log(artistFollowersOne);
+		// console.log(artistGenresOne);
+		// console.log(artistImageHeightOne);
+		// console.log(artistPopularityOne);
+		// console.log(artistUriOne);
 
 		if(!nodes.includes({name: artistNameOne, id: artistIdOne})) {
-			nodes.push({name: artistNameOne, id: artistIdOne});
+			nodes.push({
+				name: artistNameOne, 
+				id: artistIdOne,
+				followers: artistFollowersOne,
+				genres: artistGenresOne,
+				imageHeight: artistImageHeightOne,
+				imageUrl: artistImageUrlOne,
+				imageWidth: artistImageWidthOne,
+				popularity: artistPopularityOne,
+				uri: artistUriOne
+			});
 		}
 		await getRelatedArtists(artistIdOne, function(data) {
 			artistdata = data;
 			for(var i = 0; i < 20; i++) {
 				if(!nodes.includes({name: data[i].name, id: data[i].id})) {
-					nodes.push({name: data[i].name, id: data[i].id});
+					nodes.push({
+						name: data[i].name,
+						id: data[i].id,
+						followers: data[i].followers.total,
+						genres: data[i].genres,
+						imageHeight: data[i].images[1].height,
+						imageUrl: data[i].images[1].url,
+						imageWidth: data[i].images[1].width,
+						popularity: data[i].popularity,
+						uri: data[i].uri
+					});
 					edges.push({
 						name: artistNameOne + data[i].name,
 						source: artistNameOne,
@@ -136,7 +214,16 @@ document.getElementById("searchButton").addEventListener("click", async function
 function refreshDialer(){
 	for(var i = 0; i < nodes.length; i++) {
 		cy.add([
-			{group: "nodes", data: {id: nodes[i].name}},
+			{group: "nodes", data: {
+				id: nodes[i].name,
+				followers: nodes[i].followers,
+				genres: nodes[i].genres,
+				imgHeight: nodes[i].imageHeight,
+				imgUrl: nodes[i].imageUrl,
+				imgWidth: nodes[i].imageWidth,
+				pop: nodes[i].popularity,
+				uri: nodes[i].uri
+			}},
 		]);
 		console.log("Adding node: " + nodes[i].name);
 	};
@@ -170,44 +257,18 @@ function refreshDialer(){
 document.getElementById("reload").addEventListener("click", function() {
 	refreshDialer();
 	console.log("Refreshed");
-});
+});  
 
-let cy = cytoscape({
-	container: document.getElementById('cy'),
-  
-	elements: {
-	  nodes: [
-		{
-		  data: { id: 'a' }
-		},
-  
-		{
-		  data: { id: 'b' }
-		}
-	  ],
-	  edges: [
-		{
-		  data: { id: 'ab', source: 'a', target: 'b' }
-		}
-	  ]
-	},
-	userZoomingEnabled: true,
-	userPanningEnabled: true,
-	boxSelectionEnabled: false,
-	autounselectify: true,
-	layout: {
-	  name: 'grid',
-	  rows: 1
-	},
-  
-	// so we can see the ids
-	style: [
-	  {
-		selector: 'node',
-		style: {
-		  'label': 'data(id)'
-		}
-	  }
-	]
-  });
-  
+cy.on('click', 'node', function(evt){
+	console.log( 'clicked ' + this.id() );
+	document.getElementById("artist").innerText = this.data('id');
+	document.getElementById("artist").style.textDecoration = "underline";
+	document.getElementById("foll").innerText = this.data('followers');
+	document.getElementById("genr").innerText = this.data('genres');
+	document.getElementById("pop").innerText = this.data('pop');
+	document.getElementById("uri").innerText = this.data('uri');
+
+	document.getElementById("img").src = this.data('imgUrl');
+	document.getElementById("img").width = 320; //this.data('imgWidth');
+	document.getElementById("img").height = 320; //this.data('imgHeight');
+});

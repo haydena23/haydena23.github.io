@@ -269,7 +269,7 @@ cy.on('click', 'node', function(evt){
 	document.getElementById("foll").innerText = this.data('followers').toLocaleString("en-US");
 	document.getElementById("genr").innerText = this.data('genres');
 	document.getElementById("pop").innerText = this.data('pop');
-	document.getElementById("uri").innerText = this.data('uri');
+	document.getElementById("uri").href = this.data('uri');
 
 	document.getElementById("img").src = this.data('imgUrl');
 	document.getElementById("img").width = 320; //this.data('imgWidth');

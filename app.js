@@ -214,7 +214,10 @@ document.getElementById("searchButton").addEventListener("click", async function
 function refreshDialer(){
 	for(var i = 0; i < nodes.length; i++) {
 		cy.add([
-			{group: "nodes", data: {
+			{group: "nodes", style: {
+				height: nodes[i].popularity,
+				width: nodes[i].popularity,
+			}, data: {
 				id: nodes[i].name,
 				followers: nodes[i].followers,
 				genres: nodes[i].genres,

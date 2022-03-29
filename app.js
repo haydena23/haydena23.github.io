@@ -263,7 +263,7 @@ cy.on('click', 'node', function(evt){
 	console.log( 'clicked ' + this.id() );
 	document.getElementById("artist").innerText = this.data('id');
 	document.getElementById("artist").style.textDecoration = "underline";
-	document.getElementById("foll").innerText = this.data('followers');
+	document.getElementById("foll").innerText = this.data('followers').toLocaleString("en-US");
 	document.getElementById("genr").innerText = this.data('genres');
 	document.getElementById("pop").innerText = this.data('pop');
 	document.getElementById("uri").innerText = this.data('uri');

@@ -5,11 +5,10 @@
  * Click on a node to see relavant information for that artist, as well as display related artists
  * the newly selected artist.
  * 
- * Authors:
- * 		Tony Hayden
- * 		Kai Vickers
- * 		Connor Morgan
- * 		Geryl Vinoya
+ * @author Tony Hayden
+ * @author Kai Vickers
+ * @author Connor Morgan
+ * @author Geryl Vinoya
  * 
  * This project was made for CS445: Computer Networks during the Spring 2022 semester at the University of Portland
  */
@@ -92,9 +91,6 @@ let cy = cytoscape({
 
 /**
  * Updates the current authentication token for Spotify API
- * 
- * @author Connor Morgan
- * 
  */
 function updateToken() {
 	var request = new XMLHttpRequest();

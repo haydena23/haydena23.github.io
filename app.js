@@ -122,7 +122,7 @@ async function getIdFromName(name, callback) {
 	request.setRequestHeader('Content-Type', 'application/json');
 	request.onload = function() {
 		var data = JSON.parse(request.responseText).artists.items[0];
-		//console.log(data);
+		console.log(data);
 		callback(data);		
 	}
 	request.send(null);
@@ -147,6 +147,7 @@ async function getRelatedArtists(baseArtistId, callback) {
 			
 		request.onload = function () {
 			var data = JSON.parse(request.responseText).artists;
+			console.log(data);
 			callback(data);
 		}
 		request.send(null);
@@ -204,6 +205,19 @@ document.getElementById("searchButton").addEventListener("click", async function
 		artistPopularityOne = data.popularity;
 		artistUriOne = data.uri;
 
+		// Set initial artist data
+		document.getElementById("artist").innerText = artistNameOne;
+		document.getElementById("artist").style.textDecoration = "underline";
+		document.getElementById("foll").innerText = artistFollowersOne.toLocaleString("en-US");
+		document.getElementById("genr").innerText = artistGenresOne;
+		document.getElementById("pop").innerText = artistPopularityOne;
+		document.getElementById("uri").href = artistUriOne;
+	
+		// Set initial artist image
+		document.getElementById("img").src = artistImageUrlOne;
+		document.getElementById("img").width = 320;
+		document.getElementById("img").height = 320;
+
 		// Create initial artist node
 		if(!nodes.includes({name: artistNameOne, id: artistIdOne})) {
 			nodes.push({
@@ -223,7 +237,13 @@ document.getElementById("searchButton").addEventListener("click", async function
 		await getRelatedArtists(artistIdOne, async function(data) {
 			// Store the 20 artist objects in artistdata
 			artistdata = data;
-
+			if(data.length == 0) {
+				if(confirm("Unable to pull data from artist")) {
+					location.reload();
+				} else {
+					//...
+				}
+			}
 			// Iterate and add nodes 20 times for all related artists
 			// Also add an edge between original artist and related artist
 			for(var i = 0; i < 20; i++) {
@@ -397,13 +417,13 @@ cy.on('click', 'node', async function(evt){
 				* This loop takes all of the selected nodes related artists, an searches through entire node list for matching relations
 				* If found, it adds an edge between the two. Makes graph very hard to read, very fast
 				*/
-				// for(var h = 0; h < nodes.length; h++) {
-				// 	if(nodes[h].name === data[i].name) {
-				// 		cy.add([
-				// 			{group: "edges", data: {id: artistNameRef+nodes[h].name, source: artistNameRef, target: nodes[h].name}}
-				// 		]);
-				// 	}
-				// }
+				for(var h = 0; h < nodes.length; h++) {
+					if(nodes[h].name === data[i].name) {
+						cy.add([
+							{group: "edges", data: {id: artistNameRef+nodes[h].name, source: artistNameRef, target: nodes[h].name}}
+						]);
+					}
+				}
 			}
 
 			// Refresh graph with 'cose' layout

@@ -239,11 +239,11 @@ document.getElementById("searchButton").addEventListener("click", async function
 	}, 10);
 });
 
-document.getElementById("log").addEventListener("click", function() {
-	console.log("Node size: " + nodes.length);
-	console.log(nodes);
-	console.log(edges);
-});  
+// document.getElementById("log").addEventListener("click", function() {
+// 	console.log("Node size: " + nodes.length);
+// 	console.log(nodes);
+// 	console.log(edges);
+// });  
 
 cy.on('click', 'node', async function(evt){
 	console.log( 'clicked ' + this.data('val'));

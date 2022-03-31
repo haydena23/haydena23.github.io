@@ -431,6 +431,6 @@ cy.on('click', 'node', async function(evt){
 		}, 10);
 	}, 10);
 	// Checks to see newly updated nodes and edges
-	// console.log(nodes);
-	// console.log(edges);
+	 console.log(nodes);
+	 console.log(edges);
 });

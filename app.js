@@ -6,11 +6,6 @@ var redirect_uri = "https://haydena23.github.io";
 var scopes = 'user-read-private user-read-email';
 var token = 'BQA6i8CKmnfcyCizkGAxpT63_iEs-tSZHk3PMwX4DHy1sQYoziMUjDuCvmHDMBUNci5ir1jTuuHm1W9XQpM';
 
-var artistName;
-
-var artistListNames = [];
-var artistListId = [];
-
 var nodes = [{
 	name: '',
 	id: '',
@@ -239,12 +234,6 @@ document.getElementById("searchButton").addEventListener("click", async function
 	}, 10);
 });
 
-// document.getElementById("log").addEventListener("click", function() {
-// 	console.log("Node size: " + nodes.length);
-// 	console.log(nodes);
-// 	console.log(edges);
-// });  
-
 cy.on('click', 'node', async function(evt){
 	console.log( 'clicked ' + this.data('val'));
 	console.log( 'clicked ' + this.data('id'));
@@ -256,8 +245,8 @@ cy.on('click', 'node', async function(evt){
 	document.getElementById("uri").href = this.data('uri');
 
 	document.getElementById("img").src = this.data('imgUrl');
-	document.getElementById("img").width = 320; //this.data('imgWidth');
-	document.getElementById("img").height = 320; //this.data('imgHeight');
+	document.getElementById("img").width = 320;
+	document.getElementById("img").height = 320;
 
 	await getNameFromId(this.data('val'), async function(data) {
 		artistNameRef = data.name;

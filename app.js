@@ -423,7 +423,7 @@ cy.on('click', 'node', async function(evt){
 				name: 'cose',
 		
 				animate: true,
-				animationDuration: 1000,
+				animationDuration: 500,
 				fit: true,
 				nodeRepulsion: 5
 			});

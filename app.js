@@ -1,3 +1,20 @@
+/**
+ * Musical Nodes
+ * 
+ * A website to search for your favorite Spotify artist, and display artists related to that.
+ * Click on a node to see relavant information for that artist, as well as display related artists
+ * the newly selected artist.
+ * 
+ * Authors:
+ * 		Tony Hayden
+ * 		Kai Vickers
+ * 		Connor Morgan
+ * 		Geryl Vinoya
+ * 
+ * This project was made for CS445: Computer Networks during the Spring 2022 semester at the University of Portland
+ */
+
+// Spotify OAuth 2.0 variables for HTML GET header
 var url = "https://api.spotify.com/v1/search?q={name}&type=artist";
 var relatedArtist = "https://api.spotify.com/v1/artists/{id}/related-artists"
 var client_id = '8d2bba2a92db40bd8b107fbe226957b9';
@@ -5,7 +22,9 @@ var client_secret = '53dcaf963d5348798fc5e3fce02117f6';
 var redirect_uri = "https://haydena23.github.io";
 var scopes = 'user-read-private user-read-email';
 var token = 'BQA6i8CKmnfcyCizkGAxpT63_iEs-tSZHk3PMwX4DHy1sQYoziMUjDuCvmHDMBUNci5ir1jTuuHm1W9XQpM';
+var authOptions = {"form":{"grant_type":"client_credentials"}};
 
+// Node structure
 var nodes = [{
 	name: '',
 	id: '',
@@ -18,14 +37,17 @@ var nodes = [{
 	uri: ''
 }];
 
+// Edge structure
 var edges = [{
 	name: '',
 	source: '',
 	target: ''
 }];
 
+//Currently selected node
 var currentNode;
 
+// Initialize the cytoscape graph with initial data
 let cy = cytoscape({
 	container: document.getElementById('cy'),
   
@@ -45,6 +67,8 @@ let cy = cytoscape({
 		}
 	  ]
 	},
+
+	// User interaction settings for the graph
 	userZoomingEnabled: true,
 	userPanningEnabled: true,
 	boxSelectionEnabled: false,
@@ -55,7 +79,7 @@ let cy = cytoscape({
 	  rows: 1
 	},
   
-	// so we can see the ids
+	// Allows selection of the nodes when searching by element
 	style: [
 	  {
 		selector: 'node',
@@ -66,8 +90,12 @@ let cy = cytoscape({
 	]
   });
 
-var authOptions = {"form":{"grant_type":"client_credentials"}};
-
+/**
+ * Updates the current authentication token for Spotify API
+ * 
+ * @author Connor Morgan
+ * 
+ */
 function updateToken() {
 	var request = new XMLHttpRequest();
 	request.open('POST', 'https://accounts.spotify.com/api/token', true);
@@ -75,21 +103,20 @@ function updateToken() {
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 	var t;
 	request.onload = function() {
-		console.log(this.responseText);
+		//console.log(this.responseText);
 		token = JSON.parse(request.responseText).access_token;
-		console.log(token);
+		//console.log(token);
 	}
 	request.send("grant_type=client_credentials");
 }
 
-function resolveAfter2Seconds(x) {
-	return new Promise(resolve => {
-	  setTimeout(() => {
-		resolve(x);
-	  }, 30000);
-	});
-  }
-
+/**
+ * Sends a GET request using a given artist name and returns the Spotify API ID 
+ * of that artist
+ * 
+ * @param {string} name 
+ * @param {*} callback 
+ */
 async function getIdFromName(name, callback) {
 	var request = new XMLHttpRequest();
 	var searchUrl = "https://api.spotify.com/v1/search?q={name}&type=artist";
@@ -99,17 +126,23 @@ async function getIdFromName(name, callback) {
 	request.setRequestHeader('Content-Type', 'application/json');
 	request.onload = function() {
 		var data = JSON.parse(request.responseText).artists.items[0];
-		console.log(data);
+		//console.log(data);
 		callback(data);		
 	}
 	request.send(null);
 }
 
+/**
+ * Sends a GET request using a given artist ID and returns 20 related artists
+ * 
+ * @param {string} baseArtistId 
+ * @param {*} callback 
+ */
 async function getRelatedArtists(baseArtistId, callback) {
 	var request = new XMLHttpRequest();
-	console.log("trying to get related artists");
+	//console.log("Trying to get related artists");
 	if (baseArtistId !== undefined) {
-		console.log('getting related artists');
+		//console.log('Success: Now getting related artists');
 		var relatedArtistUrl = "https://api.spotify.com/v1/artists/{id}/related-artists"
 		relatedArtistUrl = relatedArtistUrl.replace("{id}", baseArtistId);
 		request.open("GET", relatedArtistUrl, true);
@@ -123,6 +156,13 @@ async function getRelatedArtists(baseArtistId, callback) {
 		request.send(null);
 	}
 }
+
+/**
+ * Sends a GET request using a given artist ID and returns the artists name
+ * 
+ * @param {string} id 
+ * @param {*} callback 
+ */
 async function getNameFromId(id, callback) {
 	var request = new XMLHttpRequest();
 	var searchUrl = "https://api.spotify.com/v1/artists/{id}";
@@ -132,24 +172,32 @@ async function getNameFromId(id, callback) {
 	request.setRequestHeader('Content-Type', 'application/json');
 	request.onload = function() {
 		var data = JSON.parse(request.responseText);
-		console.log(data);
+		//console.log(data);
 		callback(data);		
 	}
 	request.send(null);
 }
 
+// Call updateToken() to set a new, valid token for the session. Valid for 1 hour
 updateToken();
-document.getElementById("searchButton").addEventListener("click", async function(){
-	console.log("button pressed");
 
+/**
+ * Handles the search button being clicked
+ */
+document.getElementById("searchButton").addEventListener("click", async function(){
+	//console.log("Search button pressed");
+
+	// Remove the search button for further searches
 	document.getElementById("searchButton").remove();
 
-	var artistIdOne;
 	var name = document.getElementById("searchField").value;
-	var artistdata;
-	console.log(name);
-	/** FIRST PASSTHROUGH **/
+	console.log("Initial artist: " + name);
+
+	/** FIRST PASSTHROUGH SETTING INITIAL NODE/RELATED ARTISTS **/
+	// Get the ID of the searched artist name
 	await getIdFromName(name, async function(data) {
+
+		// Set all variables of the original searched artist
 		artistIdOne = data.id;
 		artistNameOne = data.name;
 		artistFollowersOne = data.followers.total;
@@ -160,6 +208,7 @@ document.getElementById("searchButton").addEventListener("click", async function
 		artistPopularityOne = data.popularity;
 		artistUriOne = data.uri;
 
+		// Create initial artist node
 		if(!nodes.includes({name: artistNameOne, id: artistIdOne})) {
 			nodes.push({
 				name: artistNameOne, 
@@ -173,8 +222,14 @@ document.getElementById("searchButton").addEventListener("click", async function
 				uri: artistUriOne
 			});
 		}
+
+		// Retrieve related artists to the original search artist
 		await getRelatedArtists(artistIdOne, async function(data) {
+			// Store the 20 artist objects in artistdata
 			artistdata = data;
+
+			// Iterate and add nodes 20 times for all related artists
+			// Also add an edge between original artist and related artist
 			for(var i = 0; i < 20; i++) {
 				if(!nodes.includes({name: data[i].name, id: data[i].id})) {
 					nodes.push({
@@ -195,12 +250,13 @@ document.getElementById("searchButton").addEventListener("click", async function
 					})
 				}
 			}
+			// Remove the initial artist node
+			// This prevents repeats/looped edges back to the original artist
 			nodes.shift();
 			edges.shift();
-			console.log(artistdata)
-			console.log(nodes);
-			console.log(edges);
 
+			// Add all stored nodes to the Cytoscape graph
+			// Create cytoscape nodes using stored node data
 			for(var i = 0; i < nodes.length; i++) {
 				cy.add([
 					{group: "nodes", style: {
@@ -218,15 +274,22 @@ document.getElementById("searchButton").addEventListener("click", async function
 						uri: nodes[i].uri
 					}},
 				]);
-				console.log("Adding node: " + nodes[i].name);
+				console.log("Added node: " + nodes[i].name);
 			};
+
+			// Add all stored edges to the Cytoscape graph
+			// Create cytoscape edges using stored edge data
 			for(var i = 1; i < nodes.length; i++) {
 				cy.add([
 					{group: "edges", data: {id: nodes[0].name+nodes[i].name, source: nodes[0].name, target: nodes[i].name}}
 				]);
 			}
+
+			// Remove the original 'a' and 'b' nodes
 			cy.remove('node[id="a"]');
 			cy.remove('node[id="b"]');
+
+			// Display all created cyto nodes in a circle, animate their movement and fit it in the viewbox
 			cy.layout({
 				name: 'circle',
 		
@@ -234,28 +297,43 @@ document.getElementById("searchButton").addEventListener("click", async function
 				animationDuration: 1000,
 				fit: true,
 			});
-			console.log(nodes);
-			console.log("AFTER");
+
+			// console.log("Nodes after initial passthrough");
+			// console.log(nodes);
 		}, 10);
 	}, 10);
 });
 
+// Zoom cytoscape onto the selected node
 document.getElementById("locate").addEventListener("click", function(){
-	console.log(currentNode);
+	console.log("Zoomed to current node: " + currentNode.id());
+	//console.log(currentNode);
 	cy.zoom({
 		level: 3,
 		position: currentNode.position()
 	})
 });
 
+// Refresh the page to reset everything
 document.getElementById("reset").addEventListener("click", function(){
 	location.reload();
 });
 
+/**
+ * Handles clicking a node on the cytoscape graph.
+ * 
+ * It pulls all of the nodes data and sets the description text on the right side
+ * It also fetches all related artists for that node. If any newly related artists are already displayed,
+ * it gets rid of that artist and goes to the next. Only adds newly seen artists.
+ * 
+ * NOTE: It can connect all related artists, however this gets messy. See comment block below
+ */
 cy.on('click', 'node', async function(evt){
 	currentNode = this;
-	console.log( 'clicked ' + this.data('val'));
-	console.log( 'clicked ' + this.data('id'));
+	// console.log( 'clicked ' + this.data('val'));
+	console.log( 'Clicked on node: ' + this.data('id'));
+
+	// Set all artist data on sidebar
 	document.getElementById("artist").innerText = this.data('id');
 	document.getElementById("artist").style.textDecoration = "underline";
 	document.getElementById("foll").innerText = this.data('followers').toLocaleString("en-US");
@@ -263,16 +341,22 @@ cy.on('click', 'node', async function(evt){
 	document.getElementById("pop").innerText = this.data('pop');
 	document.getElementById("uri").href = this.data('uri');
 
+	// Set artist image
 	document.getElementById("img").src = this.data('imgUrl');
 	document.getElementById("img").width = 320;
 	document.getElementById("img").height = 320;
 
+	// Using selected node as initial node, retrieve related artist
+	// Ensure there are no repeat artist nodes, then add them to the
+	// node/edge list, then create cytoscape node/edges
 	await getNameFromId(this.data('val'), async function(data) {
 		artistNameRef = data.name;
 		artistIdRef = data.id;
 
 		await getRelatedArtists(artistIdRef, async function(data) {
 			artistdata = data;
+
+			// Create nodes/edges, then cytoscape nodes/edges
 			for(var i = 0; i < 20; i++) {
 				if(!(nodes.some(item => item.id === data[i].id))) {
 					nodes.push({
@@ -312,7 +396,11 @@ cy.on('click', 'node', async function(evt){
 					]);
 					console.log("Added node: " + data[i].name);
 				}
-				// UNCOMMENT BELOW TO CONNECT ALL RELATED NODES
+				/**
+				* UNCOMMENT BELOW TO CONNECT ALL RELATED NODES
+				* This loop takes all of the selected nodes related artists, an searches through entire node list for matching relations
+				* If found, it adds an edge between the two. Makes graph very hard to read, very fast
+				*/
 				// for(var h = 0; h < nodes.length; h++) {
 				// 	if(nodes[h].name === data[i].name) {
 				// 		cy.add([
@@ -321,7 +409,8 @@ cy.on('click', 'node', async function(evt){
 				// 	}
 				// }
 			}
-			console.log(artistdata);
+
+			// Refresh graph with 'cose' layout
 			cy.layout({
 				name: 'cose',
 		
@@ -330,8 +419,10 @@ cy.on('click', 'node', async function(evt){
 				fit: true,
 				nodeRepulsion: 5
 			});
+
 		}, 10);
 	}, 10);
-	console.log(nodes);
-	console.log(edges);
+	// Checks to see newly updated nodes and edges
+	// console.log(nodes);
+	// console.log(edges);
 });

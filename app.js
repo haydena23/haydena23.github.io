@@ -13,16 +13,6 @@
  * This project was made for CS445: Computer Networks during the Spring 2022 semester at the University of Portland
  */
 
-// Spotify OAuth 2.0 variables for HTML GET header
-// var url = "https://api.spotify.com/v1/search?q={name}&type=artist";
-// var relatedArtist = "https://api.spotify.com/v1/artists/{id}/related-artists"
-// var client_id = '8d2bba2a92db40bd8b107fbe226957b9';
-// var client_secret = '53dcaf963d5348798fc5e3fce02117f6';
-// var redirect_uri = "https://haydena23.github.io";
-// var scopes = 'user-read-private user-read-email';
-var token = 'BQA6i8CKmnfcyCizkGAxpT63_iEs-tSZHk3PMwX4DHy1sQYoziMUjDuCvmHDMBUNci5ir1jTuuHm1W9XQpM';
-//var authOptions = {"form":{"grant_type":"client_credentials"}};
-
 // Node structure
 var nodes = [{
 	name: '',
@@ -89,6 +79,8 @@ let cy = cytoscape({
 	]
   });
 
+// Authentication token 
+var token = 'BQA6i8CKmnfcyCizkGAxpT63_iEs-tSZHk3PMwX4DHy1sQYoziMUjDuCvmHDMBUNci5ir1jTuuHm1W9XQpM';
 /**
  * Updates the current authentication token for Spotify API
  */

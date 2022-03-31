@@ -24,6 +24,8 @@ var edges = [{
 	target: ''
 }];
 
+var currentNode;
+
 let cy = cytoscape({
 	container: document.getElementById('cy'),
   
@@ -47,6 +49,7 @@ let cy = cytoscape({
 	userPanningEnabled: true,
 	boxSelectionEnabled: false,
 	autounselectify: true,
+	wheelSensitivity: .1,
 	layout: {
 	  name: 'grid',
 	  rows: 1
@@ -139,6 +142,8 @@ updateToken();
 document.getElementById("searchButton").addEventListener("click", async function(){
 	console.log("button pressed");
 
+	document.getElementById("searchButton").remove();
+
 	var artistIdOne;
 	var name = document.getElementById("searchField").value;
 	var artistdata;
@@ -229,12 +234,26 @@ document.getElementById("searchButton").addEventListener("click", async function
 				animationDuration: 1000,
 				fit: true,
 			});
+			console.log(nodes);
 			console.log("AFTER");
 		}, 10);
 	}, 10);
 });
 
+document.getElementById("locate").addEventListener("click", function(){
+	console.log(currentNode);
+	cy.zoom({
+		level: 3,
+		position: currentNode.position()
+	})
+});
+
+document.getElementById("reset").addEventListener("click", function(){
+	location.reload();
+});
+
 cy.on('click', 'node', async function(evt){
+	currentNode = this;
 	console.log( 'clicked ' + this.data('val'));
 	console.log( 'clicked ' + this.data('id'));
 	document.getElementById("artist").innerText = this.data('id');
@@ -291,17 +310,26 @@ cy.on('click', 'node', async function(evt){
 					cy.add([
 						{group: "edges", data: {id: artistNameRef+nodes[nodes.length-1].name, source: artistNameRef, target: nodes[nodes.length-1].name}}
 					]);
-					cy.layout({
-						name: 'cose',
-				
-						animate: true,
-						animationDuration: 1000,
-						fit: true,
-						nodeRepulsion: 5
-					});
 					console.log("Added node: " + data[i].name);
 				}
+				// UNCOMMENT BELOW TO CONNECT ALL RELATED NODES
+				// for(var h = 0; h < nodes.length; h++) {
+				// 	if(nodes[h].name === data[i].name) {
+				// 		cy.add([
+				// 			{group: "edges", data: {id: artistNameRef+nodes[h].name, source: artistNameRef, target: nodes[h].name}}
+				// 		]);
+				// 	}
+				// }
 			}
+			console.log(artistdata);
+			cy.layout({
+				name: 'cose',
+		
+				animate: true,
+				animationDuration: 1000,
+				fit: true,
+				nodeRepulsion: 5
+			});
 		}, 10);
 	}, 10);
 	console.log(nodes);

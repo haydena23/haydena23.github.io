@@ -238,7 +238,7 @@ document.getElementById("searchButton").addEventListener("click", async function
 			// Store the 20 artist objects in artistdata
 			artistdata = data;
 			if(data.length == 0) {
-				if(confirm("Unable to pull data from artist")) {
+				if(confirm("Unable to pull all data from artist. This is often due to the artist being too small, or they don't have any related artists.")) {
 					location.reload();
 				} else {
 					//...

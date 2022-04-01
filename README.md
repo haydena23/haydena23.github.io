@@ -4,3 +4,4 @@
 * Make the site look good (CSS)
 * Think of more stuff idk
 * Description of the project in the README
+* Search for an artist on the graph, zoom into it if found

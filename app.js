@@ -366,14 +366,11 @@ cy.on('cxttap', 'node', async function(evt){
 
 			await getRelatedArtists(artistIdRef, async function(data) {
 				artistdata = data;
-				console.log("Before");
-				console.log(artistdata);
-				console.log("After");
 				// Create nodes/edges, then cytoscape nodes/edges
 				for(var i = 0; i < 20; i++) {
-					console.log("ARTIST DATA BELOW");
-					console.log(artistdata[i]);
+
 					if(!(nodes.some(item => item.id === artistdata[i].id))) {
+						// If artist has no associated pictures
 						if(artistdata[i].images == undefined || artistdata[i].images.length == 0) {
 							nodes.push({
 								name: artistdata[i].name,
@@ -386,9 +383,9 @@ cy.on('cxttap', 'node', async function(evt){
 								popularity: artistdata[i].popularity,
 								uri: artistdata[i].uri
 							});
-							console.log("No image");
-						} else {
-							console.log("Has image");
+						} 
+						// If artist has associated pictures
+						else {
 							nodes.push({
 								name: artistdata[i].name,
 								id: artistdata[i].id,

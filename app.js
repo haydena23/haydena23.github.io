@@ -454,3 +454,32 @@ cy.on('click', 'node', async function(evt){
 	document.getElementById("img").width = 320;
 	document.getElementById("img").height = 320;
 });
+
+var currentlyRemoved;
+var cytoNodes;
+var cytoEdges;
+
+/**
+ * Function to isolate selected node and its related nodes. Restores them on second click
+ */
+document.getElementById("isolate").addEventListener("click", function(){
+	if(!currentlyRemoved) {
+		var initialNode = currentNode;
+		var allConnections = initialNode.neighborhood();
+		cytoNodes = cy.elements('node');
+		cytoEdges = cy.elements('edge');
+		cy.remove('node');
+		cy.remove('edge');	
+		initialNode.restore();
+		allConnections.restore();
+		currentlyRemoved = true;
+		document.getElementById("isolate").innerText = "RESTORE GRAPH";
+	} else {
+		cy.remove('node');
+		cy.remove('edge');
+		cytoNodes.restore();
+		cytoEdges.restore();
+		currentlyRemoved = false;
+		document.getElementById("isolate").innerText = "ISOLATE";
+	}
+});

@@ -367,27 +367,14 @@ cy.on('cxttap', 'node', async function(evt){
 			// Create nodes/edges, then cytoscape nodes/edges
 			for(var i = 0; i < 20; i++) {
 				if(!(nodes.some(item => item.id === data[i].id))) {
-					if(data[i].images[1] == undefined) {
-						nodes.push({
-							name: data[i].name,
-							id: data[i].id,
-							followers: data[i].followers.total,
-							genres: data[i].genres,
-							imageHeight: data[i].images[0].height,
-							imageUrl: data[i].images[0].url,
-							imageWidth: data[i].images[0].width,
-							popularity: data[i].popularity,
-							uri: data[i].uri
-						});
-					} else {
 					nodes.push({
 						name: data[i].name,
 						id: data[i].id,
 						followers: data[i].followers.total,
 						genres: data[i].genres,
-						imageHeight: data[i].images[1].height,
-						imageUrl: data[i].images[1].url,
-						imageWidth: data[i].images[1].width,
+						imageHeight: data[i].imageHeight,
+						imageUrl: data[i].imageUrl,
+						imageWidth: data[i].imageWidth,
 						popularity: data[i].popularity,
 						uri: data[i].uri
 					});
@@ -416,7 +403,6 @@ cy.on('cxttap', 'node', async function(evt){
 						{group: "edges", data: {id: artistNameRef+nodes[nodes.length-1].name, source: artistNameRef, target: nodes[nodes.length-1].name}}
 					]);
 					console.log("Added node: " + data[i].name);
-					}
 				}
 				/**
 				* UNCOMMENT BELOW TO CONNECT ALL RELATED NODES

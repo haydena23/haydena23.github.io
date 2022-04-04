@@ -327,6 +327,8 @@ document.getElementById("reset").addEventListener("click", function(){
 	location.reload();
 });
 
+var currentlyRemoved = false;
+
 /**
  * Handles right clicking a node on the cytoscape graph.
  * 
@@ -337,102 +339,123 @@ document.getElementById("reset").addEventListener("click", function(){
  * NOTE: It can connect all related artists, however this gets messy. See comment block below
  */
 cy.on('cxttap', 'node', async function(evt){
-	currentNode = this;
-	// console.log( 'clicked ' + this.data('val'));
-	console.log( 'Clicked on node: ' + this.data('id'));
+	if(!currentlyRemoved) {		
+		currentNode = this;
+		// console.log( 'clicked ' + this.data('val'));
+		console.log( 'Clicked on node: ' + this.data('id'));
 
-	// Set all artist data on sidebar
-	document.getElementById("artist").innerText = this.data('id');
-	document.getElementById("artist").style.textDecoration = "underline";
-	document.getElementById("foll").innerText = this.data('followers').toLocaleString("en-US");
-	document.getElementById("genr").innerText = this.data('genres');
-	document.getElementById("pop").innerText = this.data('pop');
-	document.getElementById("uri").href = this.data('uri');
+		// Set all artist data on sidebar
+		document.getElementById("artist").innerText = this.data('id');
+		document.getElementById("artist").style.textDecoration = "underline";
+		document.getElementById("foll").innerText = this.data('followers').toLocaleString("en-US");
+		document.getElementById("genr").innerText = this.data('genres');
+		document.getElementById("pop").innerText = this.data('pop');
+		document.getElementById("uri").href = this.data('uri');
 
-	// Set artist image
-	document.getElementById("img").src = this.data('imgUrl');
-	document.getElementById("img").width = 320;
-	document.getElementById("img").height = 320;
+		// Set artist image
+		document.getElementById("img").src = this.data('imgUrl');
+		document.getElementById("img").width = 320;
+		document.getElementById("img").height = 320;
 
-	// Using selected node as initial node, retrieve related artist
-	// Ensure there are no repeat artist nodes, then add them to the
-	// node/edge list, then create cytoscape node/edges
-	await getNameFromId(this.data('val'), async function(data) {
-		artistNameRef = data.name;
-		artistIdRef = data.id;
+		// Using selected node as initial node, retrieve related artist
+		// Ensure there are no repeat artist nodes, then add them to the
+		// node/edge list, then create cytoscape node/edges
+		await getNameFromId(this.data('val'), async function(data) {
+			artistNameRef = data.name;
+			artistIdRef = data.id;
 
-		await getRelatedArtists(artistIdRef, async function(data) {
-			artistdata = data;
-
-			// Create nodes/edges, then cytoscape nodes/edges
-			for(var i = 0; i < 20; i++) {
-				if(!(nodes.some(item => item.id === data[i].id))) {
-					nodes.push({
-						name: data[i].name,
-						id: data[i].id,
-						followers: data[i].followers,
-						genres: data[i].genres,
-						imageHeight: data[i].imageHeight,
-						imageUrl: data[i].imageUrl,
-						imageWidth: data[i].imageWidth,
-						popularity: data[i].popularity,
-						uri: data[i].uri
-					});
-					edges.push({
-						name: artistNameRef + data[i].name,
-						source: artistNameRef,
-						target: data[i].name
-					})
-					cy.add([
-						{group: "nodes", style: {
-							height: nodes[nodes.length-1].popularity,
-							width: nodes[nodes.length-1].popularity,
-						}, data: {
-							val: nodes[nodes.length-1].id,
-							id: nodes[nodes.length-1].name,
-							followers: nodes[nodes.length-1].followers,
-							genres: nodes[nodes.length-1].genres,
-							imgHeight: nodes[nodes.length-1].imageHeight,
-							imgUrl: nodes[nodes.length-1].imageUrl,
-							imgWidth: nodes[nodes.length-1].imageWidth,
-							pop: nodes[nodes.length-1].popularity,
-							uri: nodes[nodes.length-1].uri
-						}},
-					]);
-					cy.add([
-						{group: "edges", data: {id: artistNameRef+nodes[nodes.length-1].name, source: artistNameRef, target: nodes[nodes.length-1].name}}
-					]);
-					console.log("Added node: " + data[i].name);
-				}
-				/**
-				* UNCOMMENT BELOW TO CONNECT ALL RELATED NODES
-				* This loop takes all of the selected nodes related artists, an searches through entire node list for matching relations
-				* If found, it adds an edge between the two. Makes graph very hard to read, very fast
-				*/
-				for(var h = 0; h < nodes.length; h++) {
-					if(nodes[h].name === data[i].name) {
+			await getRelatedArtists(artistIdRef, async function(data) {
+				artistdata = data;
+				console.log("Before");
+				console.log(artistdata);
+				console.log("After");
+				// Create nodes/edges, then cytoscape nodes/edges
+				for(var i = 0; i < 20; i++) {
+					console.log("ARTIST DATA BELOW");
+					console.log(artistdata[i]);
+					if(!(nodes.some(item => item.id === artistdata[i].id))) {
+						if(artistdata[i].images == undefined || artistdata[i].images.length == 0) {
+							nodes.push({
+								name: artistdata[i].name,
+								id: artistdata[i].id,
+								followers: artistdata[i].followers.total,
+								genres: artistdata[i].genres,
+								imageHeight: 320,
+								imageUrl: "https://www.carnival.com/_ui/responsive/ccl/assets/images/notfound_placeholder.svg",
+								imageWidth: 320,
+								popularity: artistdata[i].popularity,
+								uri: artistdata[i].uri
+							});
+							console.log("No image");
+						} else {
+							console.log("Has image");
+							nodes.push({
+								name: artistdata[i].name,
+								id: artistdata[i].id,
+								followers: artistdata[i].followers.total,
+								genres: artistdata[i].genres,
+								imageHeight: artistdata[i].images[0].height,
+								imageUrl: artistdata[i].images[0].url,
+								imageWidth: artistdata[i].images[0].width,
+								popularity: artistdata[i].popularity,
+								uri: artistdata[i].uri
+							});
+						}
+						edges.push({
+							name: artistNameRef + artistdata[i].name,
+							source: artistNameRef,
+							target: artistdata[i].name
+						})
 						cy.add([
-							{group: "edges", data: {id: artistNameRef+nodes[h].name, source: artistNameRef, target: nodes[h].name}}
+							{group: "nodes", style: {
+								height: nodes[nodes.length-1].popularity,
+								width: nodes[nodes.length-1].popularity,
+							}, data: {
+								val: nodes[nodes.length-1].id,
+								id: nodes[nodes.length-1].name,
+								followers: nodes[nodes.length-1].followers,
+								genres: nodes[nodes.length-1].genres,
+								imgHeight: nodes[nodes.length-1].imageHeight,
+								imgUrl: nodes[nodes.length-1].imageUrl,
+								imgWidth: nodes[nodes.length-1].imageWidth,
+								pop: nodes[nodes.length-1].popularity,
+								uri: nodes[nodes.length-1].uri
+							}},
 						]);
+						cy.add([
+							{group: "edges", data: {id: artistNameRef+nodes[nodes.length-1].name, source: artistNameRef, target: nodes[nodes.length-1].name}}
+						]);
+						console.log("Added node: " + data[i].name);
+					}
+					/**
+					* UNCOMMENT BELOW TO CONNECT ALL RELATED NODES
+					* This loop takes all of the selected nodes related artists, an searches through entire node list for matching relations
+					* If found, it adds an edge between the two. Makes graph very hard to read, very fast
+					*/
+					for(var h = 0; h < nodes.length; h++) {
+						if(nodes[h].name === data[i].name) {
+							cy.add([
+								{group: "edges", data: {id: artistNameRef+nodes[h].name, source: artistNameRef, target: nodes[h].name}}
+							]);
+						}
 					}
 				}
-			}
+				// Refresh graph with 'cose' layout
+				cy.layout({
+					name: 'cose',
+			
+					animate: true,
+					animationDuration: 500,
+					fit: true,
+					nodeRepulsion: 5
+				});
 
-			// Refresh graph with 'cose' layout
-			cy.layout({
-				name: 'cose',
-		
-				animate: true,
-				animationDuration: 500,
-				fit: true,
-				nodeRepulsion: 5
-			});
-
+			}, 10);
 		}, 10);
-	}, 10);
-	// Checks to see newly updated nodes and edges
-	 console.log(nodes);
-	 console.log(edges);
+		// Checks to see newly updated nodes and edges
+		console.log(nodes);
+		console.log(edges);
+	}
 });
 
 // Handles left click to update artist data. 
@@ -455,7 +478,6 @@ cy.on('click', 'node', async function(evt){
 	document.getElementById("img").height = 320;
 });
 
-var currentlyRemoved;
 var cytoNodes;
 var cytoEdges;
 

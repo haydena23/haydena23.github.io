@@ -62,7 +62,7 @@ let cy = cytoscape({
 	userPanningEnabled: true,
 	boxSelectionEnabled: false,
 	autounselectify: true,
-	wheelSensitivity: .1,
+	wheelSensitivity: .5,
 	layout: {
 	  name: 'grid',
 	  rows: 1
@@ -328,7 +328,7 @@ document.getElementById("reset").addEventListener("click", function(){
 });
 
 /**
- * Handles clicking a node on the cytoscape graph.
+ * Handles right clicking a node on the cytoscape graph.
  * 
  * It pulls all of the nodes data and sets the description text on the right side
  * It also fetches all related artists for that node. If any newly related artists are already displayed,
@@ -336,7 +336,7 @@ document.getElementById("reset").addEventListener("click", function(){
  * 
  * NOTE: It can connect all related artists, however this gets messy. See comment block below
  */
-cy.on('click', 'node', async function(evt){
+cy.on('cxttap', 'node', async function(evt){
 	currentNode = this;
 	// console.log( 'clicked ' + this.data('val'));
 	console.log( 'Clicked on node: ' + this.data('id'));
@@ -447,4 +447,53 @@ cy.on('click', 'node', async function(evt){
 	// Checks to see newly updated nodes and edges
 	 console.log(nodes);
 	 console.log(edges);
+});
+
+// Handles left click to update artist data. 
+cy.on('click', 'node', async function(evt){
+	currentNode = this;
+	// console.log( 'clicked ' + this.data('val'));
+	console.log( 'Clicked on node: ' + this.data('id'));
+
+	// Set all artist data on sidebar
+	document.getElementById("artist").innerText = this.data('id');
+	document.getElementById("artist").style.textDecoration = "underline";
+	document.getElementById("foll").innerText = this.data('followers').toLocaleString("en-US");
+	document.getElementById("genr").innerText = this.data('genres');
+	document.getElementById("pop").innerText = this.data('pop');
+	document.getElementById("uri").href = this.data('uri');
+
+	// Set artist image
+	document.getElementById("img").src = this.data('imgUrl');
+	document.getElementById("img").width = 320;
+	document.getElementById("img").height = 320;
+});
+
+var currentlyRemoved;
+var cytoNodes;
+var cytoEdges;
+
+/**
+ * Function to isolate selected node and its related nodes. Restores them on second click
+ */
+document.getElementById("isolate").addEventListener("click", function(){
+	if(!currentlyRemoved) {
+		var initialNode = currentNode;
+		var allConnections = initialNode.neighborhood();
+		cytoNodes = cy.elements('node');
+		cytoEdges = cy.elements('edge');
+		cy.remove('node');
+		cy.remove('edge');	
+		initialNode.restore();
+		allConnections.restore();
+		currentlyRemoved = true;
+		document.getElementById("isolate").innerText = "RESTORE GRAPH";
+	} else {
+		cy.remove('node');
+		cy.remove('edge');
+		cytoNodes.restore();
+		cytoEdges.restore();
+		currentlyRemoved = false;
+		document.getElementById("isolate").innerText = "ISOLATE";
+	}
 });

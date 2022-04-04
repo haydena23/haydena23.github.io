@@ -1,4 +1,10 @@
+@font-face {
+  font-family: 'GothamMedium';
+  src: url('/fonts/GothamMedium.otf')  format('opentype');
+}
+
 #cy {
+  font-family: 'GothamMedium';
   height: 100%;
   width: 60%;
   position: absolute;
@@ -14,4 +20,8 @@
   float: right;
   /* padding: 1%; */
   justify-content: center;
+}
+
+body, button[type=button], input[type=text] {
+  font-family: 'GothamMedium';
 }

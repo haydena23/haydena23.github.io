@@ -370,7 +370,7 @@ cy.on('cxttap', 'node', async function(evt){
 					nodes.push({
 						name: data[i].name,
 						id: data[i].id,
-						followers: data[i].followers.total,
+						followers: data[i].followers,
 						genres: data[i].genres,
 						imageHeight: data[i].imageHeight,
 						imageUrl: data[i].imageUrl,

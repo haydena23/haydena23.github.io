@@ -441,7 +441,7 @@ cy.on('cxttap', 'node', async function(evt){
 				cy.layout({
 					name: 'cose',
 			
-					animate: true,
+					animate: false,
 					animationDuration: 500,
 					fit: true,
 					nodeRepulsion: 5

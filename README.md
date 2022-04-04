@@ -31,3 +31,4 @@ ______________________________________________
 - [x] Button to hide all nodes but artist and their related nodes (Right click brings back hidden nodes, iterates for new nodes)
 - [ ] Pick random color value, assign to a clicked node and their edges (Everything is grey right now, this differentiates artists and their connections)
 - [ ] Add some sort of analytics
+- [ ] Search for artist, pull list to select starting artist rather than automatically choosing first result

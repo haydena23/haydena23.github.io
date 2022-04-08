@@ -73,7 +73,14 @@ let cy = cytoscape({
 	  {
 		selector: 'node',
 		style: {
-		  'label': 'data(id)'
+		  'label': 'data(id)',
+		  'background-color': 'black'
+		}
+	  },
+	  {
+		selector: 'edge',
+		style: {
+			'line-color': 'grey'
 		}
 	  }
 	]

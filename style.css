@@ -25,3 +25,27 @@
 body, button[type=button], input[type=text] {
   font-family: 'GothamMedium';
 }
+
+h1 {
+  font-size: 50px;
+  color: #1ed760;
+  position: relative;
+  top: -5px;
+  left: 25px
+}
+
+body {
+  background-image: linear-gradient(to bottom, black, black 112px, #1ed760 112px, #1ed760);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+#logo img {
+  position: absolute;
+  top: 14px;
+  right: 25px;
+  width: 85px;
+}
+#content {
+  position: relative;
+}

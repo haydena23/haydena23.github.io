@@ -32,3 +32,5 @@ ______________________________________________
 - [ ] Pick random color value, assign to a clicked node and their edges (Everything is grey right now, this differentiates artists and their connections)
 - [ ] Add some sort of analytics
 - [ ] Search for artist, pull list to select starting artist rather than automatically choosing first result
+- [ ] Add better search bar/update layout of descriptions
+- [ ] Add page to turn website into game like Wikipedia game. Given one artist, try to get to target artist in fewest clicks
